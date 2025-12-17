@@ -130,16 +130,13 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
     }
 
 
-    // --------- ПРИМЕР ВЫЗОВА СЕТИ (RETROFIT) ---------
+    // --------- ПРИМЕР ВЫЗОВА СЕТИ ---------
 
     fun syncBrandsFromServer() {
         viewModelScope.launch {
             try {
                 val remote = repository.loadBrandsFromServer()
-                // здесь можно было бы сохранить remote в БД,
-                // но для учебного задания достаточно самого вызова
             } catch (_: Exception) {
-                // игнорируем ошибку сети
             }
         }
     }

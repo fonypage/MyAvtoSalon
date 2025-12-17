@@ -54,7 +54,7 @@ class ClientsFragment : Fragment() {
     private fun callClient(client: Client) {
         val phone = client.phone
         if (phone.isBlank()) {
-            Toast.makeText(requireContext(), "У клиента не указан телефон", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "У клиента не контакт для связи", Toast.LENGTH_SHORT).show()
             return
         }
         startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone")))
@@ -69,7 +69,7 @@ class ClientsFragment : Fragment() {
         }
 
         val editName = EditText(context).apply { hint = "ФИО клиента" }
-        val editPhone = EditText(context).apply { hint = "Телефон" }
+        val editPhone = EditText(context).apply { hint = "Контакт для связи" }
 
         layout.addView(editName)
         layout.addView(editPhone)
@@ -83,7 +83,7 @@ class ClientsFragment : Fragment() {
                 val phone = editPhone.text.toString().trim()
 
                 if (name.isEmpty() || phone.isEmpty()) {
-                    Toast.makeText(context, "Имя и телефон не могут быть пустыми", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Имя и контакт не могут быть пустыми", Toast.LENGTH_SHORT).show()
                 } else {
                     viewModel.addClient(fullName = name, phone = phone)
                 }
@@ -104,7 +104,8 @@ class ClientsFragment : Fragment() {
             setText(client.fullName)
         }
         val editPhone = EditText(context).apply {
-            hint = "Телефон"
+            hint = "Контакт для связи"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
             setText(client.phone)
         }
 
@@ -120,7 +121,7 @@ class ClientsFragment : Fragment() {
                 val phone = editPhone.text.toString().trim()
 
                 if (name.isEmpty() || phone.isEmpty()) {
-                    Toast.makeText(context, "Имя и телефон не могут быть пустыми", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Имя и контакт не могут быть пустыми", Toast.LENGTH_SHORT).show()
                 } else {
                     viewModel.updateClient(client.copy(fullName = name, phone = phone))
                 }

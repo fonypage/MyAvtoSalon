@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ВОТ ЭТО ДОБАВЬ
         setSupportActionBar(binding.toolbar)
 
         if (savedInstanceState == null) {
