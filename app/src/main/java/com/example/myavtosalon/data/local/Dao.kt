@@ -20,6 +20,12 @@ interface BrandDao {
 
     @Delete
     suspend fun delete(brand: Brand)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<Brand>)
+
+    @Query("DELETE FROM brands")
+    suspend fun deleteAll()
 }
 
 /**
@@ -40,6 +46,13 @@ interface CarModelDao {
 
     @Delete
     suspend fun delete(model: CarModel)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<CarModel>)
+
+    @Query("DELETE FROM car_models")
+    suspend fun deleteAll()
+
 }
 
 /**
@@ -60,4 +73,11 @@ interface ClientDao {
 
     @Delete
     suspend fun delete(client: Client)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<Client>)
+
+    @Query("DELETE FROM clients")
+    suspend fun deleteAll()
+
 }

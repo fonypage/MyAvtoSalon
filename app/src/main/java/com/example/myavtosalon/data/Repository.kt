@@ -9,11 +9,12 @@ import com.example.myavtosalon.data.local.Client
 import com.example.myavtosalon.data.remote.ApiFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.myavtosalon.data.sync.XmlSyncParserAvto
 
 /**
  * Repository – слой между ViewModel и источниками данных (Room + Retrofit).
  */
-class Repository(context: Context) {
+class Repository(private val context: Context) {
 
     // Room
     private val db = AppDatabase.getInstance(context)
@@ -129,4 +130,19 @@ class Repository(context: Context) {
         withContext(Dispatchers.IO) {
             ApiFactory.api.getClients()
         }
+
+    suspend fun syncFromXml(): Int = withContext(Dispatchers.IO) {
+        val payload = XmlSyncParserAvto.parse(context)
+
+        clientDao.deleteAll()
+        modelDao.deleteAll()
+        brandDao.deleteAll()
+
+        brandDao.insertAll(payload.brands)
+        modelDao.insertAll(payload.models)
+        clientDao.insertAll(payload.clients)
+
+        payload.brands.size + payload.models.size + payload.clients.size
+    }
+
 }

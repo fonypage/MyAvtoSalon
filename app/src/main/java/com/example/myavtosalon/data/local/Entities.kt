@@ -1,5 +1,5 @@
 package com.example.myavtosalon.data.local
-
+// мои сущности
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index

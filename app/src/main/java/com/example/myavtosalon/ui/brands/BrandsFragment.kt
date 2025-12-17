@@ -69,6 +69,11 @@ class BrandsFragment : Fragment() {
             R.id.action_add -> { showAddBrandDialog(); true }
             R.id.action_edit -> { showEditBrandDialog(); true }
             R.id.action_delete -> { showDeleteBrandDialog(); true }
+            R.id.action_sync -> {
+                viewModel.syncFromXml()
+                Toast.makeText(requireContext(), "Данные загружены из XML", Toast.LENGTH_SHORT).show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

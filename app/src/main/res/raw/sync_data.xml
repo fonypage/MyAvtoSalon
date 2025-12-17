@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <brands>
+        <brand id="1" name="Toyota"/>
+        <brand id="2" name="BMW"/>
+    </brands>
+
+    <models>
+        <model id="1" brandId="1" name="Camry" bodyType="Sedan" price="3500000"/>
+        <model id="2" brandId="1" name="RAV4" bodyType="SUV" price="4200000"/>
+        <model id="3" brandId="2" name="X5" bodyType="SUV" price="8500000"/>
+    </models>
+
+    <clients>
+        <client id="1" modelId="1" fullName="Иван Иванов" phone="79990001122"/>
+        <client id="2" modelId="3" fullName="Анна Смирнова" phone="79001234567"/>
+    </clients>
+</data>

@@ -26,6 +26,12 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
     private val _selectedModelId = MutableLiveData<Long?>()
     val selectedModelId: LiveData<Long?> = _selectedModelId
 
+    fun syncFromXml() {
+        viewModelScope.launch {
+            repository.syncFromXml()
+        }
+    }
+
     fun selectBrand(id: Long) {
         _selectedBrandId.value = id
         _selectedModelId.value = null
