@@ -6,11 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myavtosalon.data.local.CarModel
 import com.example.myavtosalon.databinding.ItemModelBinding
 
-/**
- * Адаптер для списка моделей выбранной марки.
- */
 class ModelsAdapter(
-    private val onClick: (CarModel) -> Unit
+    private val onClick: (CarModel) -> Unit,
+    private val onLongClick: (CarModel) -> Unit
 ) : RecyclerView.Adapter<ModelsAdapter.ModelViewHolder>() {
 
     private var items: List<CarModel> = emptyList()
@@ -20,9 +18,8 @@ class ModelsAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ModelViewHolder(
-        val binding: ItemModelBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    inner class ModelViewHolder(val binding: ItemModelBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -35,17 +32,16 @@ class ModelsAdapter(
 
         holder.binding.textModelName.text = item.name
 
-        // Собираем строку с кузовом и ценой
         val infoParts = mutableListOf<String>()
         item.bodyType?.takeIf { it.isNotBlank() }?.let { infoParts.add(it) }
         item.price?.let { infoParts.add("${it.toInt()} ₽") }
 
-        holder.binding.textModelInfo.text =
-            if (infoParts.isEmpty()) ""
-            else infoParts.joinToString(" • ")
+        holder.binding.textModelInfo.text = infoParts.joinToString(" • ")
 
-        holder.binding.root.setOnClickListener {
-            onClick(item)
+        holder.binding.root.setOnClickListener { onClick(item) }
+        holder.binding.root.setOnLongClickListener {
+            onLongClick(item)
+            true
         }
     }
 

@@ -6,11 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myavtosalon.data.local.Client
 import com.example.myavtosalon.databinding.ItemClientBinding
 
-/**
- * Адаптер для списка клиентов выбранной модели.
- */
 class ClientsAdapter(
-    private val onClick: (Client) -> Unit
+    private val onCallClick: (Client) -> Unit,
+    private val onEditClick: (Client) -> Unit,
+    private val onDeleteClick: (Client) -> Unit
 ) : RecyclerView.Adapter<ClientsAdapter.ClientViewHolder>() {
 
     private var items: List<Client> = emptyList()
@@ -20,9 +19,8 @@ class ClientsAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ClientViewHolder(
-        val binding: ItemClientBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    inner class ClientViewHolder(val binding: ItemClientBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClientViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -36,18 +34,17 @@ class ClientsAdapter(
         holder.binding.textClientName.text = item.fullName
         holder.binding.textClientPhone.text = item.phone
 
-        // Собираем дополнительную информацию
         val infoParts = mutableListOf<String>()
         item.purchaseDate?.takeIf { it.isNotBlank() }?.let { infoParts.add("Дата: $it") }
         item.dealPrice?.let { infoParts.add("Сумма: ${it.toInt()} ₽") }
+        holder.binding.textClientInfo.text = infoParts.joinToString(" • ")
 
-        holder.binding.textClientInfo.text =
-            if (infoParts.isEmpty()) ""
-            else infoParts.joinToString(" • ")
+        // Клик по карточке = звонок
+        holder.binding.root.setOnClickListener { onCallClick(item) }
 
-        holder.binding.root.setOnClickListener {
-            onClick(item)
-        }
+        // Кнопки рядом с ФИО
+        holder.binding.btnEdit.setOnClickListener { onEditClick(item) }
+        holder.binding.btnDelete.setOnClickListener { onDeleteClick(item) }
     }
 
     override fun getItemCount(): Int = items.size

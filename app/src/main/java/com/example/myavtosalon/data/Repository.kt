@@ -37,6 +37,18 @@ class Repository(context: Context) {
         }
     }
 
+    suspend fun updateBrand(brand: Brand) {
+        withContext(Dispatchers.IO) {
+            brandDao.update(brand)
+        }
+    }
+
+    suspend fun deleteBrand(brand: Brand) {
+        withContext(Dispatchers.IO) {
+            brandDao.delete(brand)
+        }
+    }
+
     suspend fun addModel(
         brandId: Long,
         name: String,
@@ -55,6 +67,19 @@ class Repository(context: Context) {
         }
     }
 
+    suspend fun updateModel(model: CarModel) {
+        withContext(Dispatchers.IO) {
+            modelDao.update(model)
+        }
+    }
+
+    suspend fun deleteModel(model: CarModel) {
+        withContext(Dispatchers.IO) {
+            modelDao.delete(model)
+        }
+    }
+
+
     suspend fun addClient(
         modelId: Long,
         fullName: String,
@@ -72,6 +97,18 @@ class Repository(context: Context) {
                     modelId = modelId
                 )
             )
+        }
+    }
+
+    suspend fun updateClient(client: Client) {
+        withContext(Dispatchers.IO) {
+            clientDao.update(client)
+        }
+    }
+
+    suspend fun deleteClient(client: Client) {
+        withContext(Dispatchers.IO) {
+            clientDao.delete(client)
         }
     }
 

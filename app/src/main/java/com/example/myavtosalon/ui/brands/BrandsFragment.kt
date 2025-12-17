@@ -1,9 +1,7 @@
 package com.example.myavtosalon.ui.brands
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -15,24 +13,20 @@ import com.example.myavtosalon.databinding.FragmentListBinding
 import com.example.myavtosalon.ui.SharedViewModel
 import com.example.myavtosalon.ui.models.ModelsFragment
 
-/**
- * Первый экран: список марок автомобилей.
- */
 class BrandsFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
-    // общая ViewModel на всё приложение (Activity scope)
     private val viewModel: SharedViewModel by activityViewModels()
-
     private lateinit var adapter: BrandsAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,51 +34,107 @@ class BrandsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = BrandsAdapter { brand ->
-            // 1) запоминаем выбранную марку во ViewModel
-            viewModel.selectBrand(brand.id)
+        // На экране Марок добавление через Menu, поэтому FAB скрываем
+        binding.fabAdd.visibility = View.GONE
 
-            // 2) переходим на экран моделей
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, ModelsFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+        adapter = BrandsAdapter(
+            onClick = { brand ->
+                viewModel.selectBrand(brand.id)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, ModelsFragment())
+                    .addToBackStack(null)
+                    .commit()
+            },
+            onLongClick = { brand ->
+                viewModel.selectBrand(brand.id)
+                Toast.makeText(requireContext(), "Выбрано: ${brand.name}", Toast.LENGTH_SHORT).show()
+            }
+        )
 
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = adapter
 
-        // Подписываемся на список марок из ViewModel
         viewModel.brands.observe(viewLifecycleOwner) { brands ->
             adapter.submitList(brands)
         }
+    }
 
-        // Обработчик кнопки "+"
-        binding.fabAdd.setOnClickListener {
-            showAddBrandDialog()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_brands, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add -> { showAddBrandDialog(); true }
+            R.id.action_edit -> { showEditBrandDialog(); true }
+            R.id.action_delete -> { showDeleteBrandDialog(); true }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun showAddBrandDialog() {
-        val editText = EditText(requireContext()).apply {
-            hint = "Введите название марки (например, Toyota)"
+        val edit = EditText(requireContext()).apply { hint = "Марка (например, Toyota)" }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Добавить марку")
+            .setView(edit)
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Подтвердить") { _, _ ->
+                val name = edit.text.toString().trim()
+                if (name.isNotBlank()) viewModel.addBrand(name)
+                else Toast.makeText(requireContext(), "Пустое имя", Toast.LENGTH_SHORT).show()
+            }
+            .show()
+    }
+
+    private fun showEditBrandDialog() {
+        val selectedId = viewModel.selectedBrandId.value
+        val brands = viewModel.brands.value
+
+        if (selectedId == null || brands.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Выберите марку (долгое нажатие)", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val brand = brands.find { it.id == selectedId } ?: run {
+            Toast.makeText(requireContext(), "Марка не найдена", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val edit = EditText(requireContext()).apply { setText(brand.name) }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Изменить марку")
+            .setView(edit)
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Подтвердить") { _, _ ->
+                val newName = edit.text.toString().trim()
+                if (newName.isNotBlank()) viewModel.updateBrand(brand.copy(name = newName))
+                else Toast.makeText(requireContext(), "Пустое имя", Toast.LENGTH_SHORT).show()
+            }
+            .show()
+    }
+
+    private fun showDeleteBrandDialog() {
+        val selectedId = viewModel.selectedBrandId.value
+        val brands = viewModel.brands.value
+
+        if (selectedId == null || brands.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Выберите марку (долгое нажатие)", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val brand = brands.find { it.id == selectedId } ?: run {
+            Toast.makeText(requireContext(), "Марка не найдена", Toast.LENGTH_SHORT).show()
+            return
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Добавить марку")
-            .setView(editText)
-            .setNegativeButton("Отмена", null)
-            .setPositiveButton("ОК") { _, _ ->
-                val name = editText.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    viewModel.addBrand(name)
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Название не может быть пустым",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            .setTitle("Удаление!")
+            .setMessage("Вы действительно хотите удалить марку \"${brand.name}\"?")
+            .setNegativeButton("Нет", null)
+            .setPositiveButton("Да") { _, _ ->
+                viewModel.deleteBrand(brand)
             }
             .show()
     }

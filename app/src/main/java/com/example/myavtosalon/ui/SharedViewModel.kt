@@ -20,8 +20,6 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repository = Repository(app)
 
-    // --------- ВЫБРАННЫЕ ЭЛЕМЕНТЫ ДЛЯ НАВИГАЦИИ ---------
-
     private val _selectedBrandId = MutableLiveData<Long?>()
     val selectedBrandId: LiveData<Long?> = _selectedBrandId
 
@@ -70,6 +68,16 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun updateBrand(brand: Brand) {
+        viewModelScope.launch { repository.updateBrand(brand) }
+    }
+
+    fun deleteBrand(brand: Brand) {
+        viewModelScope.launch { repository.deleteBrand(brand) }
+    }
+
+
+
     fun addModel(
         name: String,
         bodyType: String? = null,
@@ -85,6 +93,15 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
     }
+
+    fun updateModel(model: CarModel) {
+        viewModelScope.launch { repository.updateModel(model) }
+    }
+
+    fun deleteModel(model: CarModel) {
+        viewModelScope.launch { repository.deleteModel(model) }
+    }
+
 
     fun addClient(
         fullName: String,
@@ -103,6 +120,15 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
     }
+
+    fun updateClient(client: Client) {
+        viewModelScope.launch { repository.updateClient(client) }
+    }
+
+    fun deleteClient(client: Client) {
+        viewModelScope.launch { repository.deleteClient(client) }
+    }
+
 
     // --------- ПРИМЕР ВЫЗОВА СЕТИ (RETROFIT) ---------
 
